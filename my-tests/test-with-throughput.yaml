@@ -1,0 +1,16 @@
+apiVersion: k6.io/v1alpha1
+kind: TestRun
+metadata:
+  name: run-throughput-test
+spec:
+  parallelism: 2
+  script:
+    configMap:
+      name: throughput-test
+      file: test-throughput.js
+  arguments: -o experimental-prometheus-rw --tag testid=throughput-test-run
+  runner:
+    image: trbvocovo/k6-extended-mqtt:x86
+    env:
+      - name: K6_PROMETHEUS_RW_SERVER_URL
+        value: http://kube-prometheus-stack-prometheus.monitoring.svc.cluster.local:9090/api/v1/write

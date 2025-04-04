@@ -1,26 +1,15 @@
 import { sleep, check, fail } from 'k6';
 const mqtt = require('k6/x/mqtt')
 
-export const options = {
-  scenarios: {
-    contacts: {
-      executor: 'ramping-vus',
-      startVUs: 0,
-      stages: [
-        { duration: '60s', target: 5000 },
-        { duration: '60s', target: 5000 },
-        { duration: '10s', target: 0 },
-      ],
-      gracefulRampDown: '10s',
-    },
-  },
-};
 
-const BROKER_URL = 'mqtt://192.168.66.101:30773';
+
+const BROKER_URL = 'mqtt://emqx-listeners.default.svc.cluster.local:1883';
 
 const virtualUserId = __VU
+// Create a random 6 digit string
+const randomString = Math.random().toString(36).substring(2, 8);
 // console.log(`Creating client with id: ${virtualUserId}...`);
-const clientId = `k6-mqtt-client-${virtualUserId}`;
+const clientId = `k6-mqtt-client-${virtualUserId}-${randomString}`;
 const user = '';
 const password = '';
 const connectTimeout = 2000;
