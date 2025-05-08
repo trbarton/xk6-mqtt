@@ -141,17 +141,25 @@ func (c *client) publishMessageMetric(msgLen float64) error {
 		return ErrState
 	}
 
+	vuStateTags := state.Tags
+	if vuStateTags == nil {
+		return ErrState
+	}
+
+	additionalTags := vuStateTags.GetCurrentValues().Tags.Map()
+
 	ctx := c.vu.Context()
 	if ctx == nil {
 		return ErrState
 	}
+
 	metrics.PushIfNotDone(ctx, state.Samples, metrics.Sample{
-		TimeSeries: metrics.TimeSeries{Metric: c.metrics.SentMessages, Tags: c.metrics.TagsAndMeta.Tags},
+		TimeSeries: metrics.TimeSeries{Metric: c.metrics.SentMessages, Tags: c.metrics.TagsAndMeta.Tags.WithTagsFromMap(additionalTags)},
 		Time:       now,
 		Value:      float64(1),
 	})
 	metrics.PushIfNotDone(ctx, state.Samples, metrics.Sample{
-		TimeSeries: metrics.TimeSeries{Metric: c.metrics.SentBytes, Tags: c.metrics.TagsAndMeta.Tags},
+		TimeSeries: metrics.TimeSeries{Metric: c.metrics.SentBytes, Tags: c.metrics.TagsAndMeta.Tags.WithTagsFromMap(additionalTags)},
 		Time:       now,
 		Value:      msgLen,
 	})
